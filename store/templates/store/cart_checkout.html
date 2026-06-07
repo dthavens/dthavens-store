@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cart Checkout</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f4f4; }
+        .checkout-box { background: white; padding: 30px; border-radius: 8px; max-width: 400px; margin: auto; box-shadow: 0px 4px 6px rgba(0,0,0,0.1); }
+        .input-field { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
+        .btn-pay { width: 100%; background-color: #1b8500; color: white; padding: 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        .btn-pay:hover { background-color: #146100; }
+    </style>
+</head>
+<body>
+    <div class="checkout-box">
+        <h2>Complete Master Order</h2>
+        <p><strong>Total Items in Cart</strong></p>
+        <p style="font-size: 24px; color: #1b8500; font-weight: bold;">Grand Total: Ksh {{ cart_total }}</p>
+        <hr>
+        
+        <form method="POST">
+            {% csrf_token %}
+            <label>Full Name:</label>
+            <input type="text" name="customer_name" class="input-field" required>
+
+            <label>Delivery Location:</label>
+            <input type="text" name="delivery_address" class="input-field" required>
+
+            <label>Safaricom Phone Number:</label>
+            <input type="text" name="phone_number" class="input-field" placeholder="2547XXXXXXXX" required>
+            
+            <button type="submit" class="btn-pay">Pay Grand Total via M-Pesa</button>
+        </form>
+    </div>
+</body>
+</html>

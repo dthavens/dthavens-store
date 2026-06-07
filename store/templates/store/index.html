@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DDHavens Store</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f4f4; }
+        .header { text-align: center; margin-bottom: 40px; }
+        
+        /* NEW: The Master Grid! This forces beautiful rows automatically */
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 25px; 
+            max-width: 1200px;
+            margin: auto;
+        }
+        
+        /* Updated Card to stop it from stretching across the whole screen */
+        .card { background: white; padding: 20px; border-radius: 8px; text-align: center; box-shadow: 0px 4px 6px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: space-between; max-width: 320px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+        
+        /* Price Styles */
+        .price { color: #1b8500; font-weight: bold; font-size: 20px; margin: 10px 0; }
+        .old-price { text-decoration: line-through; color: #999; font-size: 16px; margin-right: 8px; }
+        
+        .btn-buy { color: white; padding: 12px; border-radius: 5px; text-decoration: none; font-weight: bold; display: block; width: 100%; border: none; cursor: pointer; font-size: 16px; margin-top: 10px; }
+        .btn-buy:hover { opacity: 0.9; }
+        
+        /* NEW: Gallery Styles */
+        .main-image { width: 100%; height: 280px; object-fit: cover; border-radius: 5px; margin-bottom: 10px; }
+        .thumbnail-container { display: flex; gap: 8px; justify-content: center; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
+        .thumbnail { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
+        .thumbnail:hover { border: 2px solid #f39c12; }
+
+        /* Floating WhatsApp Button */
+        .whatsapp-float { position: fixed; bottom: 20px; right: 20px; background-color: #25D366; color: white; padding: 15px 20px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 16px; box-shadow: 0px 4px 10px rgba(0,0,0,0.3); z-index: 1000; }
+        .whatsapp-float:hover { background-color: #1ebe57; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Welcome to the DDHavens Store</h1>
+        <p>Select a pair to purchase</p>
+        <a href="/cart/" style="display: inline-block; background-color: #333; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 10px;">
+            🛒 View Cart
+        </a>
+    </div>
+
+    <div class="grid">
+        {% for shoe in shoes %}
+        <div class="card">
+            
+            <div class="image-section">
+                {% if shoe.image %}
+                    <img id="main-img-{{ shoe.id }}" src="{{ shoe.image.url }}" class="main-image" alt="{{ shoe.name }}">
+                {% else %}
+                    <div class="main-image" style="background-color:#eee; display:flex; align-items:center; justify-content:center;">No Image</div>
+                {% endif %}
+                
+                <div class="thumbnail-container">
+                    {% if shoe.image %}
+                        <img src="{{ shoe.image.url }}" class="thumbnail" onclick="document.getElementById('main-img-{{ shoe.id }}').src='{{ shoe.image.url }}'">
+                    {% endif %}
+                    
+                    {% for gallery_img in shoe.gallery.all %}
+                        <img src="{{ gallery_img.image.url }}" class="thumbnail" onclick="document.getElementById('main-img-{{ shoe.id }}').src='{{ gallery_img.image.url }}'">
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="details-section">
+                <h2 style="margin: 0;">{{ shoe.name }}</h2>
+                <p style="color: #555; font-size: 14px;">{{ shoe.description }}</p>
+                
+                <p class="price">
+                    {% if shoe.old_price %}
+                        <span class="old-price">Ksh {{ shoe.old_price }}</span>
+                    {% endif %}
+                    Ksh {{ shoe.price }}
+                </p>
+                
+                <form method="POST" style="margin-top: 15px;">
+                    {% csrf_token %}
+                    <select name="size" required style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px;">
+                        <option value="" disabled selected>Select your size</option>
+                        {% for size in shoe.sizes.all %}
+                            {% if size.is_available %}
+                                <option value="{{ size.size_number }}">Size {{ size.size_number }}</option>
+                            {% else %}
+                                <option value="{{ size.size_number }}" disabled>Size {{ size.size_number }} (Sold Out)</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    
+                    <div style="display: flex; gap: 10px;">
+                        <button type="submit" formaction="/checkout/{{ shoe.id }}/" class="btn-buy" style="background-color: #000; flex: 1;">Buy Now</button>
+                        <button type="submit" formaction="/add-to-cart/{{ shoe.id }}/" class="btn-buy" style="background-color: #f39c12; flex: 1;">Add to Cart</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+        {% empty %}
+        <p style="grid-column: 1 / -1; text-align: center;">No shoes in stock right now!</p>
+        {% endfor %}
+    </div>
+
+    <a href="https://wa.me/254715227635?text=Hi!%20I%20am%20interested%20in%20buying%20shoes." class="whatsapp-float" target="_blank">
+        💬 Chat on WhatsApp
+    </a>
+
+</body>
+</html>
