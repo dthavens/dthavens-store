@@ -8,7 +8,7 @@ class Shoe(models.Model):
     description = models.TextField(blank=True, null=True)
     image = models.ImageField(upload_to='shoe_images/', blank=True, null=True) # The Main Display Image
 
-    def str(self):
+    def __str__(self):
         return self.name
 
 class ShoeSize(models.Model):
@@ -16,7 +16,7 @@ class ShoeSize(models.Model):
     size_number = models.CharField(max_length=10)
     is_available = models.BooleanField(default=True)
 
-    def str(self):
+    def __str__(self):
         status = "Available" if self.is_available else "Out of Stock"
         return f"Size {self.size_number} - {status}"
 
@@ -25,7 +25,7 @@ class ShoeImage(models.Model):
     shoe = models.ForeignKey(Shoe, related_name='gallery', on_delete=models.CASCADE)
     image = models.ImageField(upload_to='shoe_images/gallery/')
 
-    def str(self):
+    def __str__(self):
         return f"Gallery image for {self.shoe.name}"
 
 class Order(models.Model):
@@ -40,5 +40,5 @@ class Order(models.Model):
     status = models.CharField(max_length=20, default='Pending')
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def str(self):
+    def __str__(self):
         return f"Order {self.id} - {self.customer_name}"
